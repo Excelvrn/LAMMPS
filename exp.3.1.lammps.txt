@@ -11,7 +11,7 @@ atom_style atomic
 
 #for Pd50-Cu50  - 2.99
 #for Pd40-Cu60  - 2.96
-lattice		bcc 2.99
+lattice		bcc 2.99 origin 0.5 0.5 0
 
 variable BoundZ	 equal 4
 variable height	 equal 1
@@ -19,9 +19,10 @@ variable vBar	equal 1.0
 
 # f is angle
 # for Cu-Pd binary system is 5 or 36 ang
-variable f	 equal 36
+variable f	 equal 5
 
-variable Radius	 equal 10
+#	Set Radius
+variable Radius	 equal 15
 #variable Radius2 equal "$Radius + 2"
 
 variable TempK	 equal 600
@@ -42,12 +43,23 @@ variable Hfraction	 equal 1/100
 
 variable TimeStep	 equal 1/1000
 
+#	Set Colours
+#variable color1	equal	"black"
+#variable color2	equal	"grey"
+#variable background	equal	"white"
+
+#	Set Grain
+variable upg	equal	3
+variable downg	equal	-2
+
+
 
 
 #---------------- Set whole region ------------------------
 region whole cylinder z 0 0 ${Radius} -${BoundZ} ${BoundZ}  units lattice
 
 create_box 2 whole
+
 create_atoms 1 region whole &
     basis 2 2
 
@@ -68,8 +80,8 @@ group Pd_atoms type 1
 mass 1 106.42
 mass 2 63.546
 
-variable z115 atom "(z > -2)&&(z<v_height)"
-group GRAIN-2 variable z115
+variable z115 atom "(z > -3)&&(z<3)"
+group GRAIN2 variable z115
 
 # ---------- Define Interatomic Potential --------------------- 
 # S E T  
@@ -148,19 +160,22 @@ compute cRT0 all temp/region whole
 #-----------------------
 
 
-dump dump_all GRAIN-2 custom ${DumpTacts} Pd.${TempK}.*.lammpstrj id type x y z
-dump dump_H Cu_atoms custom ${DumpTacts} H_a.${TempK}.*.lammpstrj id type x y z
-dump dump_Pd Pd_atoms custom ${DumpTacts} Pd_a.${TempK}.*.lammpstrj id type x y z
-dump dump_Pd1 Pd1 custom ${DumpTacts} Pd_1.${TempK}.*.lammpstrj id type x y z
+#dump dump_all GRAIN-2 custom ${DumpTacts} Pd.${TempK}.*.lammpstrj id type x y z
+#dump dump_H Cu_atoms custom ${DumpTacts} H_a.${TempK}.*.lammpstrj id type x y z
+dump dump_Pd all custom ${DumpTacts} All.${TempK}.*.lammpstrj id type x y z
+#dump dump_Pd1 Pd1 custom ${DumpTacts} Pd_1.${TempK}.*.lammpstrj id type x y z
 
-dump dall all image ${DumpTacts} Pd.${TempK}.All.*.png type type box no 1 size 1366 768 zoom 2 &
+#dump dall all image ${DumpTacts} Pd.${TempK}.All.*.png type type box no 1 size 1366 768 zoom 2 &
+#	view 0 0 up 0 0 1
+dump dg2 GRAIN2 image ${DumpTacts} Pd.${TempK}.Grain.*.png type type  box no 1 size 1366 768 zoom 2  &
 	view 0 0 up 0 0 1
-###!dump dg2 GRAIN-2 image ${DumpTacts} Pd.${TempK}.Grain.*.jpg type type  box no 1 size 1366 768 zoom 2  &
-###!	view 0 0 up 0 0 1
 #
 # setings dump image
-###!dump_modify dg2 boxcolor yellow adiam 2 2 acolor 2 yellow  acolor 1 darkred
-dump_modify dall boxcolor yellow adiam 2 2 acolor 2 yellow  acolor 1 darkblue adiam 1 2
+dump_modify dg2 boxcolor yellow		&
+	adiam 2 2 acolor 2 black		&
+	acolor 1 lightblue	adiam 1 2		&
+	backcolor white
+#dump_modify dall boxcolor yellow adiam 2 2 acolor 2 yellow  acolor 1 darkblue adiam 1 2
 
 
 
